@@ -46,30 +46,24 @@ class IntermediateCode():
         """Generate code for variable declaration
         Format: typename name = expression
         """
-        # Generate code for the expression
         expr_result = self.generate(node.expression)
         
-        # Emit declaration instruction
         self.emit(f"{node.typename} {node.name} = {expr_result}")
 
     def generate_Assignment(self, node):
         """Generate code for assignment
         Format: name = expression
         """
-        # Generate code for the expression
         expr_result = self.generate(node.expression)
         
-        # Emit assignment instruction
         self.emit(f"{node.name} = {expr_result}")
 
     def generate_Print(self, node):
         """Generate code for print statement
         Format: print expression
         """
-        # Generate code for the printable expression
         printable_result = self.generate(node.printable)
         
-        # Emit print instruction
         self.emit(f"print {printable_result}")
 
     def generate_Identifier(self, node):
@@ -84,13 +78,11 @@ class IntermediateCode():
         """Generate code for array literal
         Format: {elem1, elem2, ...}
         """
-        # Generate code for each element
         elements = []
         for elem in node.elements:
             elem_result = self.generate(elem)
             elements.append(elem_result)
         
-        # Return array notation
         return "{" + ", ".join(elements) + "}"
 
     def generate_SliceExpr(self, node):
@@ -112,38 +104,28 @@ class IntermediateCode():
             goto L_start
         L_end:
         """
-        # Create labels
         label_start = self.new_label()
         label_body = self.new_label()
         label_end = self.new_label()
         
-        # Create temporary for iterator
         iter_temp = self.new_temp()
         
-        # Initialize iterator
         self.emit(f"{iter_temp} = iterator({node.iterable})")
         
-        # Start label
         self.emit(f"{label_start}:")
         
-        # Check if iterator has next element
         self.emit(f"if has_next({iter_temp}) goto {label_body}")
         self.emit(f"goto {label_end}")
         
-        # Body label
         self.emit(f"{label_body}:")
         
-        # Get next element
         self.emit(f"string {node.var} = next({iter_temp})")
         
-        # Generate code for loop body
         for stmt in node.body:
             self.generate(stmt)
         
-        # Jump back to start
         self.emit(f"goto {label_start}")
         
-        # End label
         self.emit(f"{label_end}:")
 
     def print_code(self):

@@ -137,10 +137,10 @@ class SyntaxAnalysis():
         return ArrayLiteral(elements)
 
     def parse_for_loop(self):
-        self.expect("KEYWORD")    # for
+        self.expect("KEYWORD")
         self.expect("LPAREN")
         loop_var = self.expect("IDENTIFIER")[1]
-        self.expect("KEYWORD")    # in
+        self.expect("KEYWORD")
         iterable = self.expect("IDENTIFIER")[1]
         self.expect("RPAREN")
         self.expect("LBRACE")

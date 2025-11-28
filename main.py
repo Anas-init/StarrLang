@@ -19,7 +19,6 @@ class CompilerGUI:
         self.root.geometry("1400x900")
         self.root.configure(bg='#2b2b2b')
         
-        # Token specifications
         self.tokens = [
             ("KEYWORD",    r'\b(string|int|array|for|while|if|else|return|in)\b'),
             ("COUT",       r'\bcout\b'),
@@ -56,16 +55,13 @@ class CompilerGUI:
     
     def setup_ui(self):
         """Setup the GUI layout"""
-        # Create main container
         main_container = tk.Frame(self.root, bg='#2b2b2b')
         main_container.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         
-        # Title
         title = tk.Label(main_container, text="StarrLang", 
                         font=('Arial', 20, 'bold'), bg='#2b2b2b', fg='#00ff00')
         title.pack(pady=(0, 10))
         
-        # Top section - Input code
         input_frame = tk.LabelFrame(main_container, text="Source Code", 
                                     font=('Arial', 12, 'bold'), 
                                     bg='#2b2b2b', fg='#ffffff', bd=2)
@@ -78,11 +74,9 @@ class CompilerGUI:
                                                     wrap=tk.WORD)
         self.code_input.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
         
-        # Buttons frame
         button_frame = tk.Frame(main_container, bg='#2b2b2b')
         button_frame.pack(fill=tk.X, pady=(0, 10))
         
-        # Compile button
         self.compile_btn = tk.Button(button_frame, text="🔨 COMPILE", 
                                      command=self.compile_code,
                                      font=('Arial', 12, 'bold'),
@@ -92,7 +86,6 @@ class CompilerGUI:
                                      bd=3, padx=20, pady=8)
         self.compile_btn.pack(side=tk.LEFT, padx=5)
         
-        # Clear button
         self.clear_btn = tk.Button(button_frame, text="🗑️ CLEAR", 
                                    command=self.clear_all,
                                    font=('Arial', 12, 'bold'),
@@ -102,7 +95,6 @@ class CompilerGUI:
                                    bd=3, padx=20, pady=8)
         self.clear_btn.pack(side=tk.LEFT, padx=5)
         
-        # Sample codes dropdown
         tk.Label(button_frame, text="Sample Code:", 
                 font=('Arial', 10), bg='#2b2b2b', fg='#ffffff').pack(side=tk.LEFT, padx=(20, 5))
         
@@ -116,11 +108,9 @@ class CompilerGUI:
         sample_dropdown.current(0)
         sample_dropdown.bind('<<ComboboxSelected>>', lambda e: self.load_sample_code())
         
-        # Notebook for phases
         self.notebook = ttk.Notebook(main_container)
         self.notebook.pack(fill=tk.BOTH, expand=True)
         
-        # Style for notebook
         style = ttk.Style()
         style.theme_use('default')
         style.configure('TNotebook', background='#2b2b2b', borderwidth=0)
@@ -129,7 +119,6 @@ class CompilerGUI:
         style.map('TNotebook.Tab', background=[('selected', '#0d7377')],
                  foreground=[('selected', '#ffffff')])
         
-        # Create tabs for each phase
         self.create_phase_tab("Tokens", "tokens")
         self.create_phase_tab("Syntax Tree", "syntax")
         self.create_phase_tab("Semantic Analysis", "semantic")
@@ -138,7 +127,6 @@ class CompilerGUI:
         self.create_phase_tab("Generated Code", "generated")
         self.create_phase_tab("Execution Output", "output")
         
-        # Status bar
         self.status_bar = tk.Label(self.root, text="Ready", 
                                    font=('Arial', 9), bg='#404040', 
                                    fg='#00ff00', anchor=tk.W, relief=tk.SUNKEN)
@@ -154,7 +142,6 @@ class CompilerGUI:
                                                 wrap=tk.WORD, state=tk.DISABLED)
         text_widget.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
         
-        # Store reference
         setattr(self, f"{key}_text", text_widget)
     
     def load_sample_code(self):
@@ -233,7 +220,6 @@ cout << arr[0:2];'''
         self.root.update()
         
         try:
-            # Phase 1: Lexical Analysis
             self.update_status("Phase 1: Lexical Analysis...", "yellow")
             lex = LexicalAnalysis(self.tokens)
             tokens = lex.lexer(code)
@@ -244,7 +230,6 @@ cout << arr[0:2];'''
             tokens_output += f"\nTotal Tokens: {len(tokens)}"
             self.update_text(self.tokens_text, tokens_output)
             
-            # Phase 2: Syntax Analysis
             self.update_status("Phase 2: Syntax Analysis...", "yellow")
             syn = SyntaxAnalysis(tokens)
             syntax_tree = syn.parse_program()
@@ -254,7 +239,6 @@ cout << arr[0:2];'''
             syntax_output += "\n✓ Syntax tree built successfully!"
             self.update_text(self.syntax_text, syntax_output)
             
-            # Phase 3: Semantic Analysis
             self.update_status("Phase 3: Semantic Analysis...", "yellow")
             sem = SemanticAnalysis()
             sem.analyze(syntax_tree)
@@ -266,7 +250,6 @@ cout << arr[0:2];'''
                 semantic_output += f"{var:20} : {var_type}\n"
             self.update_text(self.semantic_text, semantic_output)
             
-            # Phase 4: Intermediate Code Generation
             self.update_status("Phase 4: Intermediate Code Generation...", "yellow")
             ic = IntermediateCode()
             ic.generate(syntax_tree)
@@ -276,7 +259,6 @@ cout << arr[0:2];'''
                 intermediate_output += f"{i:3}. {instruction}\n"
             self.update_text(self.intermediate_text, intermediate_output)
             
-            # Phase 5: Optimization
             self.update_status("Phase 5: Code Optimization...", "yellow")
             optimizer = Optimizer(ic.get_code())
             optimized_code = optimizer.optimize()
@@ -289,7 +271,6 @@ cout << arr[0:2];'''
                 optimized_output += f"{i:3}. {instruction}\n"
             self.update_text(self.optimized_text, optimized_output)
             
-            # Phase 6: Code Generation
             self.update_status("Phase 6: Code Generation...", "yellow")
             codegen = CodeGenerator(optimized_code)
             python_code = codegen.generate()
@@ -298,11 +279,9 @@ cout << arr[0:2];'''
             generated_output += python_code
             self.update_text(self.generated_text, generated_output)
             
-            # Phase 7: Interpretation
             self.update_status("Phase 7: Execution...", "yellow")
             interpreter = Interpreter(optimized_code)
             
-            # Capture output
             old_stdout = sys.stdout
             sys.stdout = captured_output = StringIO()
             
@@ -316,7 +295,6 @@ cout << arr[0:2];'''
             output_text += execution_output
             self.update_text(self.output_text, output_text)
             
-            # Success
             self.update_status("✓ Compilation Successful!", "green")
             messagebox.showinfo("Success", "Compilation completed successfully!")
             
@@ -325,7 +303,6 @@ cout << arr[0:2];'''
             self.update_status(error_msg, "red")
             messagebox.showerror("Compilation Error", str(e))
             
-            # Show error in current tab
             import traceback
             error_details = traceback.format_exc()
             current_tab = self.notebook.select()
