@@ -15,7 +15,7 @@ from phases.interpreter import Interpreter
 class CompilerGUI:
     def __init__(self, root):
         self.root = root
-        self.root.title("Starrlang")
+        self.root.title("Mini Language Compiler")
         self.root.geometry("1400x900")
         self.root.configure(bg='#2b2b2b')
         
@@ -54,11 +54,10 @@ class CompilerGUI:
         self.load_sample_code()
     
     def setup_ui(self):
-        """Setup the GUI layout"""
         main_container = tk.Frame(self.root, bg='#2b2b2b')
         main_container.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         
-        title = tk.Label(main_container, text="StarrLang", 
+        title = tk.Label(main_container, text="Mini Language Compiler", 
                         font=('Arial', 20, 'bold'), bg='#2b2b2b', fg='#00ff00')
         title.pack(pady=(0, 10))
         
@@ -102,8 +101,11 @@ class CompilerGUI:
         sample_dropdown = ttk.Combobox(button_frame, textvariable=self.sample_var,
                                       values=["Array Slicing", "String Slicing", 
                                              "For Loop", "Complex Example", 
-                                             "Dead Code Test"],
-                                      state='readonly', width=20)
+                                             "Dead Code Test", "String Concatenation",
+                                             "Array Access", "Length Function",
+                                             "Size Function", "While Loop",
+                                             "Integer Arithmetic"],
+                                      state='readonly', width=22)
         sample_dropdown.pack(side=tk.LEFT, padx=5)
         sample_dropdown.current(0)
         sample_dropdown.bind('<<ComboboxSelected>>', lambda e: self.load_sample_code())
@@ -133,7 +135,6 @@ class CompilerGUI:
         self.status_bar.pack(side=tk.BOTTOM, fill=tk.X)
     
     def create_phase_tab(self, title, key):
-        """Create a tab for a compilation phase"""
         frame = tk.Frame(self.notebook, bg='#2b2b2b')
         self.notebook.add(frame, text=title)
         
@@ -145,7 +146,6 @@ class CompilerGUI:
         setattr(self, f"{key}_text", text_widget)
     
     def load_sample_code(self):
-        """Load sample code based on selection"""
         samples = {
             "Array Slicing": '''array arr = {"A", "B", "C", "D"};
 cout << arr[1:3];''',
@@ -173,7 +173,39 @@ string c = b;
 string unused = "Dead code";
 cout << c;
 array arr = {"X", "Y", "Z"};
-cout << arr[0:2];'''
+cout << arr[0:2];''',
+            
+            "String Concatenation": '''string hello = "Hello";
+string world = " World";
+string greeting = hello + world;
+cout << greeting;''',
+            
+            "Array Access": '''array items = {"One", "Two", "Three"};
+int index = 0;
+cout << items[index];
+int idx2 = 2;
+cout << items[idx2];''',
+            
+            "Length Function": '''string text = "Hello";
+int len = length(text);
+cout << len;''',
+            
+            "Size Function": '''array data = {"A", "B", "C", "D", "E"};
+int count = size(data);
+cout << count;''',
+            
+            "While Loop": '''int counter = 0;
+while (counter < 3) {
+    cout << counter;
+    counter = counter + 1;
+}''',
+            
+            "Integer Arithmetic": '''int a = 10;
+int b = 5;
+int sum = a + b;
+int diff = a - b;
+cout << sum;
+cout << diff;'''
         }
         
         selected = self.sample_var.get()
@@ -182,7 +214,6 @@ cout << arr[0:2];'''
             self.code_input.insert(1.0, samples[selected])
     
     def clear_all(self):
-        """Clear all text areas"""
         self.code_input.delete(1.0, tk.END)
         
         for phase in ['tokens', 'syntax', 'semantic', 'intermediate', 
@@ -195,20 +226,17 @@ cout << arr[0:2];'''
         self.update_status("Cleared", "green")
     
     def update_text(self, widget, content):
-        """Update text widget content"""
         widget.config(state=tk.NORMAL)
         widget.delete(1.0, tk.END)
         widget.insert(1.0, content)
         widget.config(state=tk.DISABLED)
     
     def update_status(self, message, color="green"):
-        """Update status bar"""
         colors = {"green": "#00ff00", "red": "#ff0000", "yellow": "#ffff00"}
         self.status_bar.config(text=message, fg=colors.get(color, "#00ff00"))
         self.root.update()
     
     def compile_code(self):
-        """Run all compilation phases"""
         code = self.code_input.get(1.0, tk.END).strip()
         
         if not code:
@@ -319,7 +347,6 @@ cout << arr[0:2];'''
             self.compile_btn.config(state=tk.NORMAL)
     
     def format_ast(self, node, indent=0):
-        """Format AST for display"""
         output = ""
         indent_str = "  " * indent
         
